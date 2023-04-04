@@ -1,5 +1,7 @@
 using Distances
 using JuMP
+using SCIP
+using COPT
 using Cbc
 
 function cal_distance(C,O)
@@ -55,7 +57,12 @@ function ini_solution(NODE, n)
 end
 
 function TSP_OPT_algo()
-    model = Model(Cbc.Optimizer)
+    # optimizer = SCIP.Optimizer(display_verblevel=4, limits_gap=0.00, lp_threads=5)
+    # model = JuMP.direct_model(optimizer)
+    # set_time_limit_sec(model, 3600)
+    # model = Model(SCIP.Optimizer)
+    model = Model(COPT.Optimizer)
+
     XY = allnodes()
     NODE, n, D = data(XY)
     x, u = setvariables(model, NODE)
@@ -89,9 +96,9 @@ function TSP_OPT_algo()
         end
         optimize!(model)
         if solve_time(model) < 0.2
-            wd +=2
+            wd += 2
         end
-        if solve_time(model) > 2
+        if solve_time(model) > 2 && wd  >= 5
             wd -= 2
         end
         if objective_value(model) < last_obj
@@ -105,4 +112,15 @@ function TSP_OPT_algo()
 
 end
 
-TSP_OPT_algo()
+@time TSP_OPT_algo()
+
+# COPT
+# objective = 673.45
+# time = 176.528221 seconds (53.11 M allocations: 2.444 GiB, 0.32% gc time, 0.42% compilation time)
+# objective = 709.83
+# time =  542.313119 seconds (103.99 M allocations: 4.125 GiB, 0.54% gc time, 0.34% compilation time)
+# objective = 752.02
+# time = 361.945157 seconds (65.26 M allocations: 2.856 GiB, 0.66% gc time, 0.56% compilation time)
+# SCIP
+# objective = +7.17422163853608e+02
+# time = 491.309024 seconds (82.27 M allocations: 2.734 GiB, 0.11% gc time, 0.17% compilation time)
