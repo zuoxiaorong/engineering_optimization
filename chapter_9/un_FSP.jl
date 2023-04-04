@@ -2,6 +2,7 @@
 # 面向不确定性损毁的设施选址问题
 using JuMP
 using SCIP
+using COPT
 using Distances
 using Plots
 
@@ -115,5 +116,14 @@ function startmodel()
     optimize!(model)
     plotresult(model, can_xy, de_xy)
 end
-startmodel()
 
+@time startmodel()
+
+# SCIP
+# obj = 1.44850000000000e+02
+# solved_time = 0.14
+# time = 11.427696 seconds (23.00 M allocations: 1.367 GiB, 4.80% gc time, 11.01% compilation time)
+# COPT
+# obj = 144.850000000
+# solved_time = 0.06
+# time = 6.747458 seconds (22.44 M allocations: 1.342 GiB, 5.39% gc time, 12.57% compilation time)
